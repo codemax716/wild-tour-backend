@@ -1,8 +1,6 @@
 const dbAuth = require('../database/auth')
 const bcrypt = require('bcrypt')
 const helper = require('../middleware/helper')
-const fs = require('fs');
-const path = require('path');
 
 
 exports.register = async (req, res) => {
@@ -46,41 +44,4 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.imageUpload = async (req, res) => {
-  const { file } = req;
-   const { filePath } = req.body;
-  const userID = req.userId._id; // Ensure this is correct based on how userId is set in req
-  if (!file) {
-    return res.status(400).json({ error: 'file upload error' });
-  }
 
-  try {
-    const folder = '../uploads';
-    const uploadDir = path.join(__dirname, folder);
-
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir);
-    }
-
-    const fileLocation = path.join(uploadDir, `${Date.now()}-${file.originalname}`);
-
-    // Save file to disk
-    await fs.promises.writeFile(fileLocation, file.buffer);
-
-    const result = await dbAuth.findByIdAndUpdate(
-      userID,
-      {
-        $set: {
-          filePath: filePath,
-          imageupload: true
-        }
-      },
-      { new: true }
-    );
-
-    res.status(200).json({ message: 'upload', filePath });
-
-  } catch (error) {
-    res.status(500).json({ error: 'An error occurred during file upload' });
-  }
-};

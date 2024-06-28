@@ -1,9 +1,10 @@
 const express = require('express')
 const app = express()
 app.use(express.json())
-const port = process.env.PORT
-
 require('dotenv').config() 
+const port = process.env.PORT
+console.log('port: ', port);
+
 
 const http = require('http')
 const cors = require('cors')
@@ -18,11 +19,7 @@ const option = {
 mongoose.connect(dbUrl, option)
     .then(() => {
         console.log('----------------------------db connected successfully-----------------------------');
-        const httpsServer = http.createServer(app);
-        const server = httpsServer.listen(port, function () {
-            console.log('-----------------------------------------', `http://localhost:${process.env.PORT}`, '----------------------------------------------------');
-        });
-        module.exports = server;
+
     }).catch((err) => {
         console.log('Error connecting to database:', err);
         process.exit(1);
@@ -34,3 +31,10 @@ app.use('/user', route)
 app.get("/", (req, res, next) => {
     res.status(200).json({ status: 200, message: "Hello from servers" });
 });
+
+
+const httpsServer = http.createServer(app);
+const server = httpsServer.listen(port, function () {
+    console.log('-----------------------------------------', `http://localhost:${process.env.PORT}`, '----------------------------------------------------');
+});
+module.exports = server;
